@@ -38,9 +38,9 @@ void setup() {
   animatedTexts = new ArrayList<AnimatedText>();
 
   // Example usage
-  WriteText(2, 5, "Traveler", 10, 0.1);
-  WriteText(4, 6, "3326", 5, 0.15);
-  WriteText(4, 8, "Incoming Message", 6, 0.05);
+  //WriteText(2, 5, "Traveler", 10, 0.1);
+  //WriteText(4, 6, "3326", 5, 0.15);
+  //WriteText(4, 8, "Incoming Message", 6, 0.05);
 }
 
 void draw() {
@@ -165,5 +165,42 @@ class AnimatedText {
 
   boolean isFinished() {
     return (state == STATE_DISAPPEARING && visibleChars == 0);
+  }
+}
+
+
+
+void keyPressed() {
+  switch (key) {
+    case 'q': case 'Q':
+      WriteText(2, 4, "PROTOCOL 5", 10, 0.05);
+      break;
+    case 'w': case 'W':
+      WriteText(3, 6, "NEW MESSAGE FROM DIRECTOR", 10, 0.05);
+      break;
+    case 'e': case 'E':
+      WriteText(1, 8, "HISTORIAN READY", 10, 0.05);
+      break;
+    case 'r': case 'R':
+      WriteText(7, 10, "TRANSFER COMPLETE", 10, 0.05);
+      break;
+    case 't': case 'T':
+      WriteText(8, 12, "ASSIGNMENT RECEIVED", 10, 0.05);
+      break;
+    case 'y': case 'Y':
+      WriteText(8, 14, "SHELTER 41", 10, 0.05);
+      break;
+    case 'u': case 'U':
+      WriteText(20, 16, "PRIMARY MISSION", 10, 0.05);
+      break;
+    case 'i': case 'I':
+      WriteText(22, 20, "DONOVAN REPORTING", 10, 0.05);
+      break;
+    case 'o': case 'O':
+      WriteText(20, 22, "TEMPORAL SHIFT", 10, 0.05);
+      break;
+    case 'p': case 'P':
+      WriteText(22, 24, "REBOOT SEQUENCE", 10, 0.05);
+      break;
   }
 }
