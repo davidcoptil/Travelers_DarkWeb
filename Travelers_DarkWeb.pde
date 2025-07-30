@@ -2,8 +2,10 @@
 int cols = 40;
 int rows = 30;
 color gridColor = #ed7818;
-color textColor = #ff0000;
-float changeRate = 0.02;
+color textColor = #ff1111;
+float changeRate = 0.03;
+float gridFontSizeMultiplier = 1;
+float textFontSizeMultiplier = 0.7;
 
 // === CONSTANTS ===
 final int STATE_APPEARING = 0;
@@ -36,19 +38,14 @@ void setup() {
   }
 
   animatedTexts = new ArrayList<AnimatedText>();
-
-  // Example usage
-  //WriteText(2, 5, "Traveler", 10, 0.1);
-  //WriteText(4, 6, "3326", 5, 0.15);
-  //WriteText(4, 8, "Incoming Message", 6, 0.05);
 }
 
 void draw() {
   background(0);
   float cellW = width / (float)cols;
   float cellH = height / (float)rows;
-  float fontSize = min(cellW, cellH) * 0.8;
-  textSize(fontSize);
+  float gridFontSize = min(cellW, cellH) * gridFontSizeMultiplier;
+  float textFontSize = min(cellW, cellH) * textFontSizeMultiplier;
 
   // Draw random grid
   for (int x = 0; x < cols; x++) {
@@ -66,6 +63,7 @@ void draw() {
         }
         fill(gridColor);
         textFont(sciFiFont);
+        textSize(gridFontSize);
         float px = x * cellW + cellW / 2;
         float py = y * cellH + cellH / 2;
         text(grid[x][y], px, py);
@@ -77,7 +75,7 @@ void draw() {
   for (int i = animatedTexts.size() - 1; i >= 0; i--) {
     AnimatedText t = animatedTexts.get(i);
     t.update();
-    t.render(cellW, cellH, fontSize);
+    t.render(cellW, cellH, textFontSize);
     if (t.isFinished()) {
       animatedTexts.remove(i);
     }
@@ -137,10 +135,11 @@ class AnimatedText {
       if (stateTimer >= duration) {
         state = STATE_DISAPPEARING;
         stateTimer = 0;
+        visibleChars = 0; // reset to start removing from left
       }
     } else if (state == STATE_DISAPPEARING) {
-      if (stateTimer >= speed && visibleChars > 0) {
-        visibleChars--;
+      if (stateTimer >= speed && visibleChars < totalChars) {
+        visibleChars++;
         stateTimer = 0;
       }
     }
@@ -150,36 +149,48 @@ class AnimatedText {
     textFont(normalFont);
     textSize(fs);
     fill(textColor);
-    for (int i = 0; i < visibleChars; i++) {
-      int cx = x + i;
-      if (cx >= cols || y >= rows) continue;
-      float px = cx * cw + cw / 2;
-      float py = y * ch + ch / 2;
-      text(msg.charAt(i), px, py);
+    if (state == STATE_DISAPPEARING) {
+      for (int i = visibleChars; i < totalChars; i++) {
+        int cx = x + i;
+        if (cx >= cols || y >= rows) continue;
+        float px = cx * cw + cw / 2;
+        float py = y * ch + ch / 2;
+        text(msg.charAt(i), px, py);
+      }
+    } else {
+      for (int i = 0; i < visibleChars; i++) {
+        int cx = x + i;
+        if (cx >= cols || y >= rows) continue;
+        float px = cx * cw + cw / 2;
+        float py = y * ch + ch / 2;
+        text(msg.charAt(i), px, py);
+      }
     }
   }
 
   boolean blocks(int cx, int cy) {
+    if (state == STATE_DISAPPEARING) {
+      return (cy == y && cx >= x + visibleChars && cx < x + totalChars);
+    }
     return (cy == y && cx >= x && cx < x + visibleChars);
   }
 
   boolean isFinished() {
-    return (state == STATE_DISAPPEARING && visibleChars == 0);
+    return (state == STATE_DISAPPEARING && visibleChars == totalChars);
   }
 }
 
-
-
+// === KEY PRESS HANDLER ===
 void keyPressed() {
   switch (key) {
     case 'q': case 'Q':
-      WriteText(2, 4, "PROTOCOL 5", 10, 0.05);
+      WriteText(2, 4, "TELL #34 @ 11:23:52", 10, 0.05);
       break;
     case 'w': case 'W':
-      WriteText(3, 6, "NEW MESSAGE FROM DIRECTOR", 10, 0.05);
+      WriteText(3, 6, "New message from director", 10, 0.05);
       break;
     case 'e': case 'E':
-      WriteText(1, 8, "HISTORIAN READY", 10, 0.05);
+      WriteText(1, 8, "Historian info ready", 10, 0.05);
       break;
     case 'r': case 'R':
       WriteText(7, 10, "TRANSFER COMPLETE", 10, 0.05);
